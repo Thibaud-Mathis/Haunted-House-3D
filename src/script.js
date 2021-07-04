@@ -2,6 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'dat.gui'
+import { Mesh } from 'three'
 
 /**
  * Base
@@ -23,13 +24,34 @@ const textureLoader = new THREE.TextureLoader()
 /**
  * House
  */
-// Temporary sphere
-const sphere = new THREE.Mesh(
-    new THREE.SphereBufferGeometry(1, 32, 32),
-    new THREE.MeshStandardMaterial({ roughness: 0.7 })
+// House - Group
+const house = new THREE.Group()
+scene.add(house)
+// House Walls
+const walls = new THREE.Mesh(
+    new THREE.BoxBufferGeometry(4, 2.8, 4),
+    new THREE.MeshStandardMaterial({ color: '#ac8e82' })
 )
-sphere.position.y = 1
-scene.add(sphere)
+walls.position.y = 2.8 * 0.5
+house.add(walls)
+// House - Roof
+const roof = new Mesh(
+    new THREE.ConeBufferGeometry(3.5, 1, 4),
+    new THREE.MeshStandardMaterial({ color: '#b35f45'})
+)
+roof.position.y = 1/2 + 2.8
+// pi half of circle
+roof.rotation.y = Math.PI * 0.25
+house.add(roof)
+// House - Door
+const door = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(2,2),
+    new THREE.MeshStandardMaterial({color: 'brown'})
+)
+door.position.y = 1
+door.position.z = 2.01
+house.add(door)
+
 
 // Floor
 const floor = new THREE.Mesh(
