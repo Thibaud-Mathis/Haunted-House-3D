@@ -18,14 +18,51 @@ const scene = new THREE.Scene()
 
 
 // FOG (color, near, far)
-const fog = new THREE.Fog('rgb(23, 65, 49)', 1, 15)
+const fogColor = 'rgb(6, 44, 44)'
+const fog = new THREE.Fog(fogColor, 1, 15)
 scene.fog = fog
 
 
 /**
  * Textures
  */
+// Door Textures
 const textureLoader = new THREE.TextureLoader()
+const doorColorTexture = textureLoader.load('textures/door/color.jpg')
+const doorAlphaTexture = textureLoader.load('textures/door/alpha.jpg')
+const doorAoTexture = textureLoader.load('textures/door/ambientOcclusion.jpg')
+const doorHeightTexture = textureLoader.load('textures/door/height.jpg')
+const doorMetalnessTexture = textureLoader.load('textures/door/metalness.jpg')
+const dooNormalTexture = textureLoader.load('textures/door/normal.jpg')
+const doorRoughnessTexture = textureLoader.load('textures/door/roughness.jpg')
+
+// Wall textures
+const wallColorMap = textureLoader.load('/textures/bricks/color.jpg')
+const wallAoMap = textureLoader.load('/textures/bricks/ambientOcclusion.jpg')
+const wallNormalMap = textureLoader.load('/textures/bricks/normal.jpg')
+const wallRoughnessMap = textureLoader.load('/textures/bricks/roughness.jpg')
+
+// Grass textures
+const grassColorMap = textureLoader.load('/textures/grass/color.jpg')
+const grassAoMap = textureLoader.load('/textures/grass/ambientOcclusion.jpg')
+const grassNormalMap = textureLoader.load('/textures/grass/normal.jpg')
+const grassRouhnessMap = textureLoader.load('/textures/grass/roughness.jpg')
+
+grassColorMap.repeat.set(8,8)
+grassAoMap.repeat.set(8,8)
+grassNormalMap.repeat.set(8,8)
+grassRouhnessMap.repeat.set(8,8)
+
+grassColorMap.wrapS = THREE.RepeatWrapping
+grassAoMap.wrapS = THREE.RepeatWrapping
+grassNormalMap.wrapS = THREE.RepeatWrapping
+grassRouhnessMap.wrapS = THREE.RepeatWrapping
+
+grassColorMap.wrapT = THREE.RepeatWrapping
+grassAoMap.wrapT = THREE.RepeatWrapping
+grassNormalMap.wrapT = THREE.RepeatWrapping
+grassRouhnessMap.wrapT = THREE.RepeatWrapping
+
 
 /**
  * House
@@ -36,7 +73,16 @@ scene.add(house)
 // House Walls
 const walls = new THREE.Mesh(
     new THREE.BoxBufferGeometry(4, 2.8, 4),
-    new THREE.MeshStandardMaterial({ color: '#ac8e82' })
+    new THREE.MeshStandardMaterial({ 
+        map: wallColorMap,
+        aoMap: wallAoMap,
+        roughnessMap: wallRoughnessMap,
+        normalMap: wallNormalMap
+     })
+)
+walls.geometry.setAttribute(
+    'uv2',
+    new THREE.Float32BufferAttribute(walls.geometry.attributes.uv.array, 2)
 )
 walls.position.y = 2.8 * 0.5
 house.add(walls)
@@ -51,10 +97,26 @@ roof.rotation.y = Math.PI * 0.25
 house.add(roof)
 // House - Door
 const door = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(2,2),
-    new THREE.MeshStandardMaterial({color: 'brown'})
+    new THREE.PlaneBufferGeometry(2.5,2.5, 100, 100),
+    new THREE.MeshStandardMaterial({
+        map: doorColorTexture, 
+        aoMap: doorAoTexture,
+        transparent: true,
+        alphaMap: doorAlphaTexture,
+        metalnessMap: doorMetalnessTexture,
+        roughnessMap: doorRoughnessTexture,
+        displacementMap: doorHeightTexture,
+        displacementScale: 0.1,
+        normalMap: dooNormalTexture,
+
+    })
 )
-door.position.y = 1
+// map uv for ambient occlusion
+door.geometry.setAttribute(
+    'uv2', 
+    new THREE.Float32BufferAttribute(door.geometry.attributes.uv.array, 2)
+)
+door.position.y = 1.13
 door.position.z = 2.01
 house.add(door)
 /**
@@ -111,7 +173,16 @@ for(let i=0; i < numberOfGraves; i++) {
 // Floor
 const floor = new THREE.Mesh(
     new THREE.PlaneBufferGeometry(20, 20),
-    new THREE.MeshStandardMaterial({ color: '#a9c388' })
+    new THREE.MeshStandardMaterial({
+        map: grassColorMap,
+        aoMap: grassAoMap,
+        roughnessMap: grassRouhnessMap,
+        normalMap: grassNormalMap
+    })
+)
+floor.geometry.setAttribute(
+    'uv2',
+    new THREE.Float32BufferAttribute(floor.geometry.attributes.uv.array, 2)
 )
 floor.rotation.x = - Math.PI * 0.5
 floor.position.y = 0
@@ -184,7 +255,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.setClearColor('rgb(23, 65, 49)')
+renderer.setClearColor(fogColor)
 
 /**
  * Animate
