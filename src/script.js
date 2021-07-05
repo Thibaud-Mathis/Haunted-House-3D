@@ -154,8 +154,6 @@ scene.add(graves)
 const graveGeometry = new THREE.BoxBufferGeometry(0.6, 0.8, 0.2)
 const graveMaterial = new THREE.MeshStandardMaterial({ color: 'grey '})
 
-
-
 const numberOfGraves = 50
 for(let i=0; i < numberOfGraves; i++) {
     const grave = new THREE.Mesh(graveGeometry, graveMaterial)
@@ -166,6 +164,7 @@ for(let i=0; i < numberOfGraves; i++) {
     grave.position.set(x, 0.3, z)
     grave.rotation.z = (Math.random() -0.5) * 0.4
     grave.rotation.y = (Math.random() -0.5) * 0.4
+    grave.castShadow = true
 
     graves.add(grave)
 }
@@ -186,6 +185,7 @@ floor.geometry.setAttribute(
 )
 floor.rotation.x = - Math.PI * 0.5
 floor.position.y = 0
+floor.receiveShadow = true
 scene.add(floor)
 
 /**
@@ -204,12 +204,26 @@ gui.add(moonLight.position, 'x').min(- 5).max(5).step(0.001)
 gui.add(moonLight.position, 'y').min(- 5).max(5).step(0.001)
 gui.add(moonLight.position, 'z').min(- 5).max(5).step(0.001)
 scene.add(moonLight)
+moonLight.castShadow = true
 
 // Door Light 
 const doorLight = new THREE.PointLight('#ff7d46', 1, 7)
 console.log(doorLight)
 doorLight.position.set(0, 2.2, 2.7)
 house.add(doorLight)
+doorLight.castShadow = true
+
+
+// Ghosts
+const ghost1 = new THREE.PointLight('#f0f', 2, 3)
+scene.add(ghost1)
+const ghost2 = new THREE.PointLight('#0ff', 2, 3)
+scene.add(ghost2)
+const ghost3 = new THREE.PointLight('#ff0', 2, 3)
+scene.add(ghost3)
+
+
+
 /**
  * Sizes
  */
@@ -256,6 +270,38 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.setClearColor(fogColor)
+/**
+ * Shadows
+ */
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
+moonLight.castShadow = true
+doorLight.castShadow = true
+ghost1.castShadow = true
+ghost2.castShadow = true
+ghost3.castShadow = true
+
+walls.castShadow = true
+bush1.castShadow = true
+bush2.castShadow = true
+bush3.castShadow = true
+bush4.castShadow = true
+// Shadow Optimize
+doorLight.shadow.mapSize.width = 256
+doorLight.shadow.mapSize.height = 256
+doorLight.shadow.camera.far = 7
+
+ghost1.shadow.mapSize.width = 256
+ghost1.shadow.mapSize.height = 256
+ghost1.shadow.camera.far = 7
+
+ghost2.shadow.mapSize.width = 256
+ghost2.shadow.mapSize.height = 256
+ghost2.shadow.camera.far = 7
+
+ghost3.shadow.mapSize.width = 256
+ghost3.shadow.mapSize.height = 256
+ghost3.shadow.camera.far = 7
 
 /**
  * Animate
@@ -265,6 +311,20 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+    const ghost1Angle = elapsedTime * 0.5
+    ghost1.position.x = Math.cos(ghost1Angle) * 4
+    ghost1.position.z = Math.sin(ghost1Angle) * 4
+    ghost1.position.y = Math.sin(ghost1Angle * 3)
+
+    const ghost2Angle = - elapsedTime * 0.32
+    ghost2.position.x = Math.cos(ghost2Angle) * 5
+    ghost2.position.z = Math.sin(ghost2Angle) * 5
+    ghost2.position.y = Math.sin(ghost2Angle * 3)
+
+    const ghost3Angle = - elapsedTime * 0.6
+    ghost3.position.x = Math.cos(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.32))
+    ghost3.position.z = Math.sin(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.5))
+    ghost3.position.y = Math.sin(ghost3Angle * 4) + Math.sin(elapsedTime * 2.5)
 
     // Update controls
     controls.update()
