@@ -79,6 +79,29 @@ bush4.scale.set(0.15, 0.15, 0.15)
 bush4.position.set(- 1, 0.05, 2.6)
 bushes.add(bush1, bush2, bush3, bush4)
 
+// Graves
+const graves = new THREE.Group()
+scene.add(graves)
+// Graves - base
+const graveGeometry = new THREE.BoxBufferGeometry(0.6, 0.8, 0.2)
+const graveMaterial = new THREE.MeshStandardMaterial({ color: 'gray '})
+
+
+
+const numberOfGraves = 50
+for(let i=0; i < numberOfGraves; i++) {
+    const grave = new THREE.Mesh(graveGeometry, graveMaterial)
+    const angle = Math.random() * Math.PI * 2 // random angle
+    const radius = 4 + Math.random() * 6 // random radius
+    const x = Math.cos(angle) * radius
+    const z= Math.sin(angle) * radius
+    grave.position.set(x, 0.3, z)
+    grave.rotation.z = (Math.random() -0.5) * 0.4
+    grave.rotation.y = (Math.random() -0.5) * 0.4
+
+    graves.add(grave)
+}
+
 // Floor
 const floor = new THREE.Mesh(
     new THREE.PlaneBufferGeometry(20, 20),
@@ -92,7 +115,7 @@ scene.add(floor)
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
+const ambientLight = new THREE.AmbientLight('#b9d5ff', 0.5)
 gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001)
 scene.add(ambientLight)
 
