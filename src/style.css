@@ -17,3 +17,7 @@ body
     left: 0;
     outline: none;
 }
+
+.colorPicker {
+    background: rgb(23, 65, 65);
+}
